@@ -50,12 +50,13 @@ Primero crear carpeta
 > mkdir channel-artifacts
 Dentro de la carpeta con el archivo "configtx.yaml", crea el bloque genesis, "ThreeOrgsOrdererGenesis" LN 218 de yaml
 > configtxgen -profile ThreeOrgsOrdererGenesis -channelID system-channel -outputBlock ./channel-artifacts/genesis.block
-Crear trasaccion de canal, "marketplace" NOMBRE DEL CANAL, "ThreeOrgsChannel" LN 232 de yaml
-> configtxgen -profile ThreeOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID marketplace
+> export CHANNEL_NAME=acmechannel
+Crear trasaccion de canal, "acmechannel" NOMBRE DEL CANAL, "ThreeOrgsChannel" LN 232 de yaml
+> configtxgen -profile ThreeOrgsChannel -outputCreateChannelTx ./channel-artifacts/channel.tx -channelID $CHANNEL_NAME
 Crear archivos de anchor peers, "Org1MSP" LN 30 de yaml, HACER ESTO PARA TODOS LOS anchors peers
-> configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID marketplace -asOrg Org1MSP
-> configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID marketplace -asOrg Org2MSP
-> configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID marketplace -asOrg Org3MSP
+> configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org1MSP
+> configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org2MSP
+> configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID $CHANNEL_NAME -asOrg Org3MSP
 
 Levantar portainer
 > docker volume create portainer_data
@@ -64,7 +65,7 @@ Levantar portainer
     Hlf2022.*+
 
 Definiendo variables
-> export CHANNEL_NAME=marketplace
+> export CHANNEL_NAME=acmechannel
 > export VERBOSE=false
 > export FABRIC_CFG_PATH=$PWD
 
@@ -74,7 +75,7 @@ Levantar ChoudDB
 COnectarse al contenedor "cli" desde portainer y ejecutar los comandos:
 > pwd
 > export CHANNEL_NAME=marketplace
-> peer channel create -o orderer.acme.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/acme.com/orderers/orderer.acme.com/msp/tlscacerts/tlsca.acme.com-cert.pem
+> peer channel create -o orderer.ceiba.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/ceiba.com/orderers/orderer.ceiba.com/msp/tlscacerts/tlsca.ceiba.com-cert.pem
 > cd channel-artifacts/
 
     PARA CONECTARSE A COUCHDB "5984": Uno de los puertos asignados al couchdb
@@ -82,20 +83,20 @@ COnectarse al contenedor "cli" desde portainer y ejecutar los comandos:
 
 Conectado las organizaciones al canal, cuando se une una organizacion al canal se crea una BD en su respectivo couchdb
     Se une la organizacion main, por defecto se una la identidad de la primera organizacion
-> peer channel join -b marketplace.block
+> peer channel join -b ceibachannel.block
     Se une al canal otra organizacion que no es la main 
-> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.acme.com/users/Admin@org2.acme.com/msp CORE_PEER_ADDRESS=peer0.org2.acme.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.acme.com/peers/peer0.org2.acme.com/tls/ca.crt peer channel join -b marketplace.block
+> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.ceiba.com/users/Admin@org2.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org2.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.ceiba.com/peers/peer0.org2.ceiba.com/tls/ca.crt peer channel join -b ceibachannel.block
 
-> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/users/Admin@org3.acme.com/msp CORE_PEER_ADDRESS=peer0.org3.acme.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/peers/peer0.org3.acme.com/tls/ca.crt peer channel join -b marketplace.block
+> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/users/Admin@org3.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org3.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/peers/peer0.org3.ceiba.com/tls/ca.crt peer channel join -b ceibachannel.block
 
 Setear el anchorpeer para cada organizacion
     Anchor peer main
-> peer channel update -o orderer.acme.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/acme.com/orderers/orderer.acme.com/msp/tlscacerts/tlsca.acme.com-cert.pem
+> peer channel update -o orderer.ceiba.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org1MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/ceiba.com/orderers/orderer.ceiba.com/msp/tlscacerts/tlsca.ceiba.com-cert.pem
 
     Setear anchor peer de una organizacion no main
-> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.acme.com/users/Admin@org2.acme.com/msp CORE_PEER_ADDRESS=peer0.org2.acme.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.acme.com/peers/peer0.org2.acme.com/tls/ca.crt peer channel update -o orderer.acme.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/acme.com/orderers/orderer.acme.com/msp/tlscacerts/tlsca.acme.com-cert.pem
+> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.ceiba.com/users/Admin@org2.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org2.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.ceiba.com/peers/peer0.org2.ceiba.com/tls/ca.crt peer channel update -o orderer.ceiba.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org2MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/ceiba.com/orderers/orderer.ceiba.com/msp/tlscacerts/tlsca.ceiba.com-cert.pem
 
-> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/users/Admin@org3.acme.com/msp CORE_PEER_ADDRESS=peer0.org3.acme.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/peers/peer0.org3.acme.com/tls/ca.crt peer channel update -o orderer.acme.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org3MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/acme.com/orderers/orderer.acme.com/msp/tlscacerts/tlsca.acme.com-cert.pem
+> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/users/Admin@org3.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org3.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/peers/peer0.org3.ceiba.com/tls/ca.crt peer channel update -o orderer.ceiba.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/Org3MSPanchors.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/ceiba.com/orderers/orderer.ceiba.com/msp/tlscacerts/tlsca.ceiba.com-cert.pem
 
 
 ***********RED BLOCKCAIN LISTA PARA CREAR CONTRATOS INTELIGENTES (CODECHAIN)***********
@@ -111,7 +112,7 @@ Se definen variables
 > export CC_RUNTIME_LANGUAGE=golang
 > export CC_SRC_PATH="../../../chaincode/$CHAINCODE_NAME/"
     Ruta del CA
-> export ORDERER_CA="/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/acme.com/orderers/orderer.acme.com/msp/tlscacerts/tlsca.acme.com-cert.pem"
+> export ORDERER_CA="/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/ceiba.com/orderers/orderer.ceiba.com/msp/tlscacerts/tlsca.ceiba.com-cert.pem"
 
 Ejecutar los comando justo en path inicial del contenedor cli (justo cuando se conecta), se compilan los archivos en un archivo tar.gz, y luego se instala en cada organizacion (ELIMINAR go.sum)
 > peer lifecycle chaincode package ${CHAINCODE_NAME}.tar.gz --path ${CC_SRC_PATH} --lang ${CC_RUNTIME_LANGUAGE} --label ${CHAINCODE_NAME}_${CHAINCODE_VERSION} >&log.txt
@@ -123,9 +124,9 @@ Se le manda a todas las organizaciones
         foodcontrol_1:3bb63d5460a2fd7bb991090accf37ea4ce3992a2ce79a17ccd7d21889146c399
         
 Instalandolo en Organizaciones no mai, tiene que setar los valores
-        > CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.acme.com/users/Admin@org2.acme.com/msp CORE_PEER_ADDRESS=peer0.org2.acme.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.acme.com/peers/peer0.org2.acme.com/tls/ca.crt peer lifecycle chaincode install ${CHAINCODE_NAME}.tar.gz
+        > CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.ceiba.com/users/Admin@org2.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org2.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org2MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org2.ceiba.com/peers/peer0.org2.ceiba.com/tls/ca.crt peer lifecycle chaincode install ${CHAINCODE_NAME}.tar.gz
 
-> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/users/Admin@org3.acme.com/msp CORE_PEER_ADDRESS=peer0.org3.acme.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/peers/peer0.org3.acme.com/tls/ca.crt peer lifecycle chaincode install ${CHAINCODE_NAME}.tar.gz
+> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/users/Admin@org3.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org3.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/peers/peer0.org3.ceiba.com/tls/ca.crt peer lifecycle chaincode install ${CHAINCODE_NAME}.tar.gz
 
 Definiendo las politicas de endorzamiento (que organizaciones puede aprovar los chaincode)
 > peer lifecycle chaincode approveformyorg --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --waitForEvent --signature-policy "OR ('Org1MSP.peer', 'Org3MSP.peer')" --package-id foodcontrol_1:3bb63d5460a2fd7bb991090accf37ea4ce3992a2ce79a17ccd7d21889146c399
@@ -134,15 +135,15 @@ Definiendo las politicas de endorzamiento (que organizaciones puede aprovar los 
 > peer lifecycle chaincode checkcommitreadiness --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --signature-policy "OR ('Org1MSP.peer', 'Org3MSP.peer')" --output json
 
 Se aprueba por la organizacion 3
-> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/users/Admin@org3.acme.com/msp CORE_PEER_ADDRESS=peer0.org3.acme.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/peers/peer0.org3.acme.com/tls/ca.crt peer lifecycle chaincode approveformyorg --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --waitForEvent --signature-policy "OR ('Org1MSP.peer', 'Org3MSP.peer')" --package-id foodcontrol_1:3bb63d5460a2fd7bb991090accf37ea4ce3992a2ce79a17ccd7d21889146c399
+> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/users/Admin@org3.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org3.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/peers/peer0.org3.ceiba.com/tls/ca.crt peer lifecycle chaincode approveformyorg --tls --cafile $ORDERER_CA --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --waitForEvent --signature-policy "OR ('Org1MSP.peer', 'Org3MSP.peer')" --package-id foodcontrol_1:3bb63d5460a2fd7bb991090accf37ea4ce3992a2ce79a17ccd7d21889146c399
 
 Se comitea los chaincode
-> peer lifecycle chaincode commit -o orderer.acme.com:7050 --tls --cafile $ORDERER_CA --peerAddresses peer0.org1.acme.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.acme.com/peers/peer0.org1.acme.com/tls/ca.crt --peerAddresses peer0.org3.acme.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/peers/peer0.org3.acme.com/tls/ca.crt --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --signature-policy "OR ('Org1MSP.peer', 'Org3MSP.peer')"
+> peer lifecycle chaincode commit -o orderer.ceiba.com:7050 --tls --cafile $ORDERER_CA --peerAddresses peer0.org1.ceiba.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.ceiba.com/peers/peer0.org1.ceiba.com/tls/ca.crt --peerAddresses peer0.org3.ceiba.com:7051 --tlsRootCertFiles /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/peers/peer0.org3.ceiba.com/tls/ca.crt --channelID $CHANNEL_NAME --name $CHAINCODE_NAME --version $CHAINCODE_VERSION --sequence 1 --signature-policy "OR ('Org1MSP.peer', 'Org3MSP.peer')"
 
 
 Consultado los ENDPOINTS, "Set" funcion del chaincode de golang
     POST
-> peer chaincode invoke -o orderer.acme.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set", "did:3", "fabio", "ramos"]}'
-> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/users/Admin@org3.acme.com/msp CORE_PEER_ADDRESS=peer0.org3.acme.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.acme.com/peers/peer0.org3.acme.com/tls/ca.crt peer chaincode invoke -o orderer.acme.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set", "did:3", "fabio ernesto", "ramos reyes"]}'
+> peer chaincode invoke -o orderer.ceiba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set", "did:3", "fabio", "ramos"]}'
+> CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/users/Admin@org3.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org3.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/peers/peer0.org3.ceiba.com/tls/ca.crt peer chaincode invoke -o orderer.ceiba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set", "did:3", "fabio ernesto", "ramos reyes"]}'
     GET
-> peer chaincode invoke -o orderer.acme.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Query", "did:3"]}'
+> peer chaincode invoke -o orderer.ceiba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Query", "did:3"]}'
