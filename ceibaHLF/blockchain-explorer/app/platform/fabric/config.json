@@ -1,0 +1,9 @@
+{
+	"network-configs": {
+		"ceiba-network": {
+			"name": "Ceiba Network",
+			"profile": "./connection-profile/test-network.json"
+		}
+	},
+	"license": "Apache-2.0"
+}

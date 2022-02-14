@@ -1,0 +1,61 @@
+{
+	"name": "ceiba-network",
+	"version": "1.0.0",
+	"license": "Apache-2.0",
+	"client": {
+		"tlsEnable": true,
+		"adminCredential": {
+			"id": "exploreradmin",
+			"password": "exploreradminpw"
+		},
+		"enableAuthentication": true,
+		"organization": "Org1MSP",
+		"connection": {
+			"timeout": {
+				"peer": {
+					"endorser": "300"
+				},
+				"orderer": "300"
+			}
+		}
+	},
+	"channels": {
+		"mychannel": {
+			"peers": {
+				"peer0.org1.ceiba.com": {}
+			},
+			"connection": {
+				"timeout": {
+					"peer": {
+						"endorser": "6000",
+						"eventHub": "6000",
+						"eventReg": "6000"
+					}
+				}
+			}
+		}
+	},
+	"organizations": {
+		"Org1MSP": {
+			"mspid": "Org1MSP",
+			"adminPrivateKey": {
+				"path": "/home/fabio/HLF_pruebas/ceibaHLF/ceiba-network/crypto-config/peerOrganizations/org1.ceiba.com/users/User1@org1.ceiba.com/msp/keystore/priv_sk"
+			},
+			"peers": ["peer0.org1.ceiba.com"],
+			"signedCert": {
+				"path": "/home/fabio/HLF_pruebas/ceibaHLF/ceiba-network/crypto-config/peerOrganizations/org1.ceiba.com/users/User1@org1.ceiba.com/msp/signcerts/User1@org1.ceiba.com-cert.pem"
+			}
+		}
+	},
+	"peers": {
+		"peer0.org1.ceiba.com": {
+			"tlsCACerts": {
+				"path": "/home/fabio/HLF_pruebas/ceibaHLF/ceiba-network/crypto-config/peerOrganizations/org1.ceiba.com/peers/peer0.org1.ceiba.com/tls/ca.crt"
+			},
+			"url": "grpcs://localhost:7051",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer0.org1.ceiba.com"
+			}
+		}
+	}
+}

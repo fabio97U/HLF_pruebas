@@ -65,7 +65,7 @@ Levantar portainer
     Hlf2022.*+
 
 Definiendo variables
-> export CHANNEL_NAME=acmechannel
+> export CHANNEL_NAME=ceibachannel
 > export VERBOSE=false
 > export FABRIC_CFG_PATH=$PWD
 
@@ -74,7 +74,7 @@ Levantar ChoudDB
 
 COnectarse al contenedor "cli" desde portainer y ejecutar los comandos:
 > pwd
-> export CHANNEL_NAME=marketplace
+> export CHANNEL_NAME=ceibachannel
 > peer channel create -o orderer.ceiba.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls true --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/ceiba.com/orderers/orderer.ceiba.com/msp/tlscacerts/tlsca.ceiba.com-cert.pem
 > cd channel-artifacts/
 
@@ -105,7 +105,7 @@ Aca se empieza a desarrollar el chaincode en golang
 Una vez se termine de escribir el chaincode, dentro del contenedor cli dirigirse a "/opt/gopath/src/github.com/chaincode", esta carpeta esta binding a la carpeta "./../chaincode" VER LINEA 133 DE "docker-compose-cli-couchdb.yaml"
 
 Se definen variables
-> export CHANNEL_NAME=marketplace
+> export CHANNEL_NAME=ceibachannel
     Nombre del chaincode a desplegar
 > export CHAINCODE_NAME=foodcontrol
 > export CHAINCODE_VERSION=1
@@ -147,3 +147,9 @@ Consultado los ENDPOINTS, "Set" funcion del chaincode de golang
 > CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/users/Admin@org3.ceiba.com/msp CORE_PEER_ADDRESS=peer0.org3.ceiba.com:7051 CORE_PEER_LOCALMSPID="Org3MSP" CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org3.ceiba.com/peers/peer0.org3.ceiba.com/tls/ca.crt peer chaincode invoke -o orderer.ceiba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Set", "did:3", "fabio ernesto", "ramos reyes"]}'
     GET
 > peer chaincode invoke -o orderer.ceiba.com:7050 --tls --cafile $ORDERER_CA -C $CHANNEL_NAME -n $CHAINCODE_NAME -c '{"Args":["Query", "did:3"]}'
+
+
+***********HL Explorer***********
+> cd /
+> git clone https://github.com/hyperledger/blockchain-explorer.git
+> cd blockchain-explorer
