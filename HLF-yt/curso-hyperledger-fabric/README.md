@@ -107,7 +107,7 @@ Una vez se termine de escribir el chaincode, dentro del contenedor cli dirigirse
 Se definen variables
 > export CHANNEL_NAME=ceibachannel
     Nombre del chaincode a desplegar
-> export CHAINCODE_NAME=foodcontrol
+> export CHAINCODE_NAME=ceibacoins
 > export CHAINCODE_VERSION=1
 > export CC_RUNTIME_LANGUAGE=golang
 > export CC_SRC_PATH="../../../chaincode/$CHAINCODE_NAME/"

@@ -7,6 +7,7 @@ require (
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/gobuffalo/envy v1.10.1 // indirect
 	github.com/gobuffalo/packd v1.0.1 // indirect
+	github.com/google/uuid v1.1.2
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20220131132609-1476cf1d3206 // indirect
 	github.com/hyperledger/fabric-contract-api-go v1.1.1
 	github.com/hyperledger/fabric-protos-go v0.0.0-20220202165055-956c75de7b17 // indirect
