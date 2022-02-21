@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
@@ -165,7 +166,7 @@ func (s *SmartContract) CrearClientes(ctx contractapi.TransactionContextInterfac
 	}
 
 	cliente := Cliente{
-		ClienteId:     "asd123",
+		ClienteId:     uuid.New(),
 		NombreCliente: nombrecliente,
 		Puntos:        puntos,
 	}

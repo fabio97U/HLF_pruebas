@@ -1,6 +1,6 @@
 module github.com/fabio97U/HLF_pruebas/ceibaHLF/chaincode/ceibacoins
 
-go 1.13
+go 1.17
 
 require (
 	github.com/go-openapi/spec v0.20.4 // indirect
